@@ -7,7 +7,8 @@ classes:
 	javac $(DIR)/*.java
 
 hs:
-	javah org.checkpoint.CheckpointRestore
+	javac -h . org/checkpoint/CheckpointRestore.java
+
 
 hpps: 	hs
 	mv org_checkpoint_CheckpointRestore.h org_checkpoint_CheckpointRestore.hpp	
