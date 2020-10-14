@@ -52,7 +52,7 @@
                 <version>3.0.0</version>
                 <executions>
                     <execution>
-                        <id>gen</id>
+                        <id>compile-cpp</id>
                         <goals>
                             <goal>exec</goal>
                         </goals>
@@ -82,7 +82,7 @@
                 <version>3.2.4</version>
                 <executions>
                     <execution>
-                        <id>java-cli</id>
+                        <id>checkpoint</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
