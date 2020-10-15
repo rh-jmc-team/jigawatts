@@ -2,24 +2,23 @@ package org.checkpoint;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.EOFException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Collections;
 
 public class CheckpointRestore {
 
-    public static CheckpointRestore crContext;
+    private static final CheckpointRestore crContext;
 
-    private static List<Hook> checkpointHooks;
-    private static List<Hook> restoreHooks;
+    private static final List<Hook> checkpointHooks;
+    private static final List<Hook> restoreHooks;
 
     public static void cleanupTheWorld() {
         System.gc();
@@ -40,7 +39,7 @@ public class CheckpointRestore {
         crContext.checkTheWorldNative();
     }
 
-    public static void saveTheWorld(String dir) {
+    public static void saveTheWorld(String dir) throws IOException {
         for (Hook h : checkpointHooks) {
             h.run();
         }
@@ -49,54 +48,38 @@ public class CheckpointRestore {
         crContext.saveTheWorldNative(dir);
     }
 
-    public static void writeRestoreHooks(String dir) {
-        try {
-            File outputDir = new File(dir);
-            outputDir.mkdir();
-            File file = new File(dir, "/JavaRestoreHooks.txt");
-            FileOutputStream f = new FileOutputStream(file);
-            ObjectOutputStream o = new ObjectOutputStream(f);
-
+    public static void writeRestoreHooks(String dir) throws IOException {
+        
+        Files.createDirectories(Paths.get(dir));
+            
+        try (FileOutputStream f = new FileOutputStream(new File(dir, "/JavaRestoreHooks.txt"));
+             ObjectOutputStream o = new ObjectOutputStream(f)) {
+            
+            o.writeInt(restoreHooks.size());
+            
             for (Hook h : restoreHooks) {
                 o.writeObject(h);
             }
-
-            o.close();
-            f.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Error initializing stream: " + e.getMessage());
         }
     }
 
-    public static void readRestoreHooks(String dir) {
-        try {
-            FileInputStream f = new FileInputStream(new File(dir + "/JavaRestoreHooks.txt"));
-            ObjectInputStream o = new ObjectInputStream(f);
+    public static void readRestoreHooks(String dir) throws IOException {
+        
+        try (FileInputStream f = new FileInputStream(new File(dir + "/JavaRestoreHooks.txt"));
+             ObjectInputStream o = new ObjectInputStream(f)) {
 
-            while (true) {
+            int count = o.readInt();
+            for (int i = 0; i < count; i++) {
                 Hook h = (Hook) o.readObject();
                 restoreHooks.add(h);
             }
 
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found");
-        } catch (EOFException e) {
-            // This always happens.
-            // It's ugly, exceptions should be exceptional.
-            // Is there a better way?
-        } catch (IOException e) {
-            System.out.println("Error initializing stream:" + e.getMessage());
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
-    public static void restoreTheWorld(String dir) {
+    public static void restoreTheWorld(String dir) throws IOException {
         crContext.restoreTheWorldNative(dir);
         readRestoreHooks(dir);
         for (Hook h : restoreHooks) {
@@ -111,19 +94,32 @@ public class CheckpointRestore {
     public static void registerRestoreHook(Hook h) {
         crContext.restoreHooks.add(h);
     }
-
-    public static void debugPrint(String s) {
-        System.out.println(s);
+    
+    // package private for junit tests
+    static void clearCheckpointHooks() {
+        crContext.checkpointHooks.clear();
+    }
+    
+    static void clearRestoreHooks() {
+        crContext.restoreHooks.clear();
+    }
+    
+    static List<Hook> getCheckpointHooks() {
+        return Collections.unmodifiableList(crContext.checkpointHooks);
+    }
+    
+    static List<Hook> getRestoreHooks() {
+        return Collections.unmodifiableList(crContext.restoreHooks);
     }
 
-    public static void copyLibrary(String s) {
-        String libraryName = System.mapLibraryName(s);
-        String temp = "/tmp";
-        InputStream is;
-        FileOutputStream os;
-        try {
-            is = CheckpointRestore.class.getClassLoader().getResourceAsStream(libraryName);
-            os = new FileOutputStream("/tmp/libCheckpointRestore.so");
+    private static void copyLibrary(String library, String destDir) throws IOException {
+        
+        String libraryName = System.mapLibraryName(library);
+        String libraryFile = destDir + "/" + libraryName;
+        
+        try (InputStream is = CheckpointRestore.class.getClassLoader().getResourceAsStream(libraryName);
+             FileOutputStream os = new FileOutputStream(libraryFile)) {
+            
             byte[] buf = new byte[1024];
 
             int bytesRead;
@@ -131,35 +127,35 @@ public class CheckpointRestore {
             while ((bytesRead = is.read(buf)) > 0) {
                 os.write(buf, 0, bytesRead);
             }
-
-            is.close();
-            os.close();
-        } catch (Exception e) {
-            System.out.println(e);
         }
-
-        System.load("/tmp/" + libraryName);
     }
 
     static {
 
-        //	DebugPrint("Library path = " + System.getProperty("java.library.path"));
-        //	DebugPrint("About to load Checkpoint Restore library " + System.mapLibraryName("CheckpointRestore"));
-        //	DebugPrint("About to load criu library " + System.mapLibraryName("criu"));
-        //	DebugPrint("Before call to load CheckpointRestore");
-        String tmpLib = "/tmp/" + System.mapLibraryName("CheckpointRestore");
-
-        File f = new File(tmpLib);
-        if (!f.exists()) {
-            copyLibrary("CheckpointRestore");
+//        System.out.println("Library path = " + System.getProperty("java.library.path"));
+//        System.out.println("About to load Checkpoint Restore library " + System.mapLibraryName("CheckpointRestore"));
+//        System.out.println("About to load criu library " + System.mapLibraryName("criu"));
+//        System.out.println("Before call to load CheckpointRestore");
+        
+        String libDir = "/tmp";
+        String tmpLib = libDir+ "/" + System.mapLibraryName("CheckpointRestore");
+        
+        if (!Files.exists(Paths.get(tmpLib))) {
+            try {
+                copyLibrary("CheckpointRestore", libDir);
+            } catch (IOException ex) {
+                throw new RuntimeException("can't initialize CheckpointRestore",ex);
+            }
         }
         System.load(tmpLib);
         System.loadLibrary("criu");
-        //	DebugPrint("After call to load criu");
+//        System.out.println("After call to load criu");
 
         checkpointHooks = new ArrayList<Hook>();
         restoreHooks = new ArrayList<Hook>();
         crContext = new CheckpointRestore();
+        
+        // this won't work with newer jdks since libloading impl changed
         try {
             java.lang.reflect.Field libs
                     = ClassLoader.class.getDeclaredField("loadedLibraryNames");
