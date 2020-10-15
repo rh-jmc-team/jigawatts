@@ -20,7 +20,7 @@
  * Method:    CheckTheWorldNative
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_CheckTheWorldNative
+JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_checkTheWorldNative
 (JNIEnv *env, jobject obj)  {
 
     int init_result = criu_init_opts();
@@ -46,7 +46,7 @@ JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_CheckTheWorldNative
  * Method:    SaveTheWorldNative
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_SaveTheWorldNative (JNIEnv * env, jobject jobj, jstring jstr) {
+JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_saveTheWorldNative (JNIEnv * env, jobject jobj, jstring jstr) {
     const char * path = env->GetStringUTFChars(jstr, NULL);
     struct stat st = {0};
 
@@ -92,7 +92,7 @@ JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_SaveTheWorldNative 
  * Method:    RestoreTheWorldNative
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_RestoreTheWorldNative
+JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_restoreTheWorldNative
 (JNIEnv * env, jobject jobj, jstring jstr) {
     const char * path = env->GetStringUTFChars(jstr, NULL);  
     int fd = open(path, O_DIRECTORY);
@@ -133,7 +133,7 @@ JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_RestoreTheWorldNati
  * Method:    MigrateTheWorld
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_MigrateTheWorld
+JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_migrateTheWorld
   (JNIEnv *, jclass);
 
 /*
@@ -141,6 +141,6 @@ JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_MigrateTheWorld
  * Method:    SaveTheWorldIncremental
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_SaveTheWorldIncremental
+JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_saveTheWorldIncremental
   (JNIEnv *, jclass);
 

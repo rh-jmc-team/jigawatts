@@ -16,40 +16,40 @@ import java.io.OutputStream;
 
 public class CheckpointRestore {
 
-    public static CheckpointRestore CRContext;
+    public static CheckpointRestore crContext;
 
-    private static List<Hook> CheckpointHooks;
-    private static List<Hook> RestoreHooks;
+    private static List<Hook> checkpointHooks;
+    private static List<Hook> restoreHooks;
 
-    public static void CleanupTheWorld() {
+    public static void cleanupTheWorld() {
         System.gc();
         System.gc();
     }
 
-    private native void CheckTheWorldNative();
+    private native void checkTheWorldNative();
 
-    private native void SaveTheWorldNative(String dir);
+    private native void saveTheWorldNative(String dir);
 
-    private native void RestoreTheWorldNative(String dir);
+    private native void restoreTheWorldNative(String dir);
 
-    public static native void MigrateTheWorld();
+    public static native void migrateTheWorld();
 
-    public static native void SaveTheWorldIncremental();
+    public static native void saveTheWorldIncremental();
 
-    public static void CheckTheWorld() {
-        CRContext.CheckTheWorldNative();
+    public static void checkTheWorld() {
+        crContext.checkTheWorldNative();
     }
 
-    public static void SaveTheWorld(String dir) {
-        for (Hook h : CheckpointHooks) {
+    public static void saveTheWorld(String dir) {
+        for (Hook h : checkpointHooks) {
             h.run();
         }
 
-        WriteRestoreHooks(dir);
-        CRContext.SaveTheWorldNative(dir);
+        writeRestoreHooks(dir);
+        crContext.saveTheWorldNative(dir);
     }
 
-    public static void WriteRestoreHooks(String dir) {
+    public static void writeRestoreHooks(String dir) {
         try {
             File outputDir = new File(dir);
             outputDir.mkdir();
@@ -57,7 +57,7 @@ public class CheckpointRestore {
             FileOutputStream f = new FileOutputStream(file);
             ObjectOutputStream o = new ObjectOutputStream(f);
 
-            for (Hook h : RestoreHooks) {
+            for (Hook h : restoreHooks) {
                 o.writeObject(h);
             }
 
@@ -71,14 +71,14 @@ public class CheckpointRestore {
         }
     }
 
-    public static void ReadRestoreHooks(String dir) {
+    public static void readRestoreHooks(String dir) {
         try {
             FileInputStream f = new FileInputStream(new File(dir + "/JavaRestoreHooks.txt"));
             ObjectInputStream o = new ObjectInputStream(f);
 
             while (true) {
                 Hook h = (Hook) o.readObject();
-                RestoreHooks.add(h);
+                restoreHooks.add(h);
             }
 
         } catch (FileNotFoundException e) {
@@ -96,23 +96,23 @@ public class CheckpointRestore {
         }
     }
 
-    public static void RestoreTheWorld(String dir) {
-        CRContext.RestoreTheWorldNative(dir);
-        ReadRestoreHooks(dir);
-        for (Hook h : RestoreHooks) {
+    public static void restoreTheWorld(String dir) {
+        crContext.restoreTheWorldNative(dir);
+        readRestoreHooks(dir);
+        for (Hook h : restoreHooks) {
             h.run();
         }
     }
 
-    public static void RegisterCheckpointHook(Hook h) {
-        CRContext.CheckpointHooks.add(h);
+    public static void registerCheckpointHook(Hook h) {
+        crContext.checkpointHooks.add(h);
     }
 
-    public static void RegisterRestoreHook(Hook h) {
-        CRContext.RestoreHooks.add(h);
+    public static void registerRestoreHook(Hook h) {
+        crContext.restoreHooks.add(h);
     }
 
-    public static void DebugPrint(String s) {
+    public static void debugPrint(String s) {
         System.out.println(s);
     }
 
@@ -157,9 +157,9 @@ public class CheckpointRestore {
         System.loadLibrary("criu");
         //	DebugPrint("After call to load criu");
 
-        CheckpointHooks = new ArrayList<Hook>();
-        RestoreHooks = new ArrayList<Hook>();
-        CRContext = new CheckpointRestore();
+        checkpointHooks = new ArrayList<Hook>();
+        restoreHooks = new ArrayList<Hook>();
+        crContext = new CheckpointRestore();
         try {
             java.lang.reflect.Field libs
                     = ClassLoader.class.getDeclaredField("loadedLibraryNames");
