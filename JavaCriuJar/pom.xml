@@ -10,7 +10,8 @@
     <name>JavaCriuJar</name>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <java.includes>${env.JAVA_HOME}</java.includes>      
     </properties>
     
     <dependencies>
@@ -82,8 +83,8 @@
                                 <argument>-v</argument>
                                 <argument>-shared</argument>
                                 <argument>-fPIC</argument>
-                                <argument>-I${java.home}/include</argument>
-                                <argument>-I${java.home}/include/linux</argument>
+                                <argument>-I${java.includes}/include</argument>
+                                <argument>-I${java.includes}/include/linux</argument>
                                 <argument>-I/usr/lib64/</argument>
                                 <argument>-I/usr/include/criu</argument>
                                 <argument>-I${project.build.directory}/native/javah</argument>
@@ -112,6 +113,22 @@
                     </execution>
                 </executions>
             </plugin>
+	    <plugin>
+	      <artifactId>maven-clean-plugin</artifactId>
+	      <version>3.1.0</version>
+	      <configuration>
+		<filesets>
+		  <fileset>
+		    <directory>src/test/resources</directory>
+		    <includes>
+		      <include>checkpoint/*</include>
+		      <include>1*</include>
+		    </includes>
+		    <followSymlinks>false</followSymlinks>
+		  </fileset>
+		</filesets>
+	      </configuration>
+	    </plugin>
         </plugins>
     </build>
 </project>

@@ -70,7 +70,8 @@ JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_saveTheWorldNative 
 
     criu_set_images_dir_fd(fd);
     criu_set_shell_job(true);
-    criu_set_log_level(4);  
+    criu_set_log_level(4);
+    criu_set_tcp_established(true);    
 
     criu_set_log_file((char *) "save.log");
     criu_set_leave_running(true);
@@ -113,6 +114,7 @@ JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_restoreTheWorldNati
     criu_set_images_dir_fd(fd);
     criu_set_log_file((char *) "javarestore.log");
     criu_set_log_level(4);
+    criu_set_tcp_established(true);
 
     int pid = criu_restore_child();
 

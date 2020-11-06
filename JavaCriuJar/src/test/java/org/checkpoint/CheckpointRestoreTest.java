@@ -26,7 +26,8 @@ public class CheckpointRestoreTest {
     public void testRestoreHookIO(@TempDir Path tmpDir) throws IOException {
         
         final String data = "frozen beans";
-        
+
+	CheckpointRestore.clearRestoreHooks();
         assertEquals(0, CheckpointRestore.getRestoreHooks().size());
         CheckpointRestore.registerRestoreHook(new TestHookA(data));
         assertEquals(1, CheckpointRestore.getRestoreHooks().size());
@@ -41,6 +42,7 @@ public class CheckpointRestoreTest {
         CheckpointRestore.readRestoreHooks(tmpDir.toString());
         assertEquals(1, CheckpointRestore.getRestoreHooks().size());
         assertEquals(data, ((TestHookA)CheckpointRestore.getRestoreHooks().get(0)).data);
+	CheckpointRestore.clearRestoreHooks();	
     }
 
 
