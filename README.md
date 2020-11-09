@@ -17,6 +17,6 @@ Caveats:
 
 ```
  $ cd JavaCriuJar
- $ mvn clean verify
+ $ sudo mvn clean verify
 
 
