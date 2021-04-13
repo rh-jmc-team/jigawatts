@@ -1,4 +1,4 @@
-import org.checkpoint.*;
+package org.checkpoint;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -123,11 +123,11 @@ public class RandomTest {
 	// Setup to run the test and checkpoint the results
 	ProcessBuilder cp = new ProcessBuilder("java", "-cp", "target/classes:target/test-classes",
 						    "-XX:+UseSerialGC", "-XX:-UsePerfData",
-						    "RandomTest", "checkpoint");
+						    "org.checkpoint.RandomTest", "checkpoint");
 	VerifyProcess(cp.start());
 
 	// Setup to restore the test
-	ProcessBuilder rs = new ProcessBuilder("java", "-cp", "target/classes:target/test-classes", "RandomTest", "restore");
+	ProcessBuilder rs = new ProcessBuilder("java", "-cp", "target/classes:target/test-classes", "org.checkpoint.RandomTest", "restore");
 	VerifyProcess(rs.start());
     }
 
