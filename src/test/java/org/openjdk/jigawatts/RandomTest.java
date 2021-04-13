@@ -1,4 +1,4 @@
-import org.openjdk.jigawatts.*;
+package org.openjdk.jigawatts;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -123,16 +123,16 @@ public class RandomTest {
 	// Setup to run the test and checkpoint the results
 	ProcessBuilder cp = new ProcessBuilder("java", "-cp", "target/classes:target/test-classes",
 						    "-XX:+UseSerialGC", "-XX:-UsePerfData",
-						    "RandomTest", "checkpoint");
+						    "org.openjdk.jigawatts.RandomTest", "checkpoint");
 	VerifyProcess(cp.start());
 
 	// Setup to restore the test
-	ProcessBuilder rs = new ProcessBuilder("java", "-cp", "target/classes:target/test-classes", "RandomTest", "restore");
+	ProcessBuilder rs = new ProcessBuilder("java", "-cp", "target/classes:target/test-classes", "org.openjdk.jigawatts.RandomTest", "restore");
 	VerifyProcess(rs.start());
     }
 
     // This is here so we can run from the command line if we want to.
-    // sudo java -cp target/classes:target/test-classes -XX:+UseSerialGC -XX:-UsePerfData RandomTest restore
+    // sudo java -cp target/classes:target/test-classes -XX:+UseSerialGC -XX:-UsePerfData org.openjdk.jigawatts.RandomTest restore
 
     public static void main(String[] args) throws Exception {
 	if (args[0].equals("checkpoint"))
