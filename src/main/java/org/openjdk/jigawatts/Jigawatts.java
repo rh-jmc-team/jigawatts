@@ -40,6 +40,9 @@ package org.openjdk.jigawatts;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.osgi.annotation.bundle.Header;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -51,6 +54,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 
+@Header(name = "Bundle-NativeCode", value = "libJigawatts.so; osname = Linux")
 public class Jigawatts {
 
     private static final Jigawatts crContext;
@@ -170,17 +174,21 @@ public class Jigawatts {
 
     static {
 
-        String libDir = System.getProperty("java.io.tmpdir");
-        String tmpLib = libDir+ "/" + System.mapLibraryName("Jigawatts");
-        
-        if (!Files.exists(Paths.get(tmpLib))) {
-            try {
-                copyLibrary("Jigawatts", libDir);
-            } catch (IOException ex) {
-                throw new RuntimeException("can't initialize Jigawatts",ex);
+        try {
+            System.loadLibrary("Jigawatts");
+        } catch (UnsatisfiedLinkError e) {
+            String libDir = System.getProperty("java.io.tmpdir");
+            String tmpLib = libDir+ "/" + System.mapLibraryName("Jigawatts");
+
+            if (!Files.exists(Paths.get(tmpLib))) {
+                try {
+                    copyLibrary("Jigawatts", libDir);
+                } catch (IOException ex) {
+                    throw new RuntimeException("can't initialize Jigawatts",ex);
+                }
             }
+            System.load(tmpLib);
         }
-        System.load(tmpLib);
         System.loadLibrary("criu");
 
         checkpointHooks = new ArrayList<Hook>();
