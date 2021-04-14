@@ -38,33 +38,25 @@
                 </configuration>
             </plugin>
             <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                <compilerArgs>
+                    <arg>-h</arg>
+                    <arg>${project.build.directory}/native/javah</arg>
+                </compilerArgs>
+                  <includes>
+                     <include>org/checkpoint/CheckpointRestore.java</include>
+                  </includes>
+              </configuration>
+           </plugin>
+            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M5</version>
                 <configuration>
                     <!-- TODO this only needed when printf is used in native code; can be remove once its gone -->
                     <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>native-maven-plugin</artifactId>
-                <version>1.0-alpha-11</version>
-                <executions>
-                    <execution>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>javah</goal>
-                        </goals>
-                        <configuration>
-                            <javahIncludes>
-                                <javahInclude>
-                                    <className>org.checkpoint.CheckpointRestore</className>
-                                    <headerName>org_checkpoint_CheckpointRestore.hpp</headerName>
-                                </javahInclude>
-                            </javahIncludes>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
