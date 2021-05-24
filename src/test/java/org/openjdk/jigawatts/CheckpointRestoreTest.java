@@ -1,4 +1,4 @@
-package org.checkpoint;
+package org.openjdk.jigawatts;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,7 +19,7 @@ public class CheckpointRestoreTest {
     
     @Test
     public void initTest() {
-        CheckpointRestore.checkTheWorld();
+        Jigawatts.checkTheWorld();
     }
 
     @Test
@@ -27,22 +27,22 @@ public class CheckpointRestoreTest {
         
         final String data = "frozen beans";
 
-	CheckpointRestore.clearRestoreHooks();
-        assertEquals(0, CheckpointRestore.getRestoreHooks().size());
-        CheckpointRestore.registerRestoreHook(new TestHookA(data));
-        assertEquals(1, CheckpointRestore.getRestoreHooks().size());
+	Jigawatts.clearRestoreHooks();
+        assertEquals(0, Jigawatts.getRestoreHooks().size());
+        Jigawatts.registerRestoreHook(new TestHookA(data));
+        assertEquals(1, Jigawatts.getRestoreHooks().size());
         
         assertEquals(0, Files.list(tmpDir).count());
-        CheckpointRestore.writeRestoreHooks(tmpDir.toString());
+        Jigawatts.writeRestoreHooks(tmpDir.toString());
         assertEquals(1, Files.list(tmpDir).count());
         
-        CheckpointRestore.clearRestoreHooks();
-        assertEquals(0, CheckpointRestore.getRestoreHooks().size());
+        Jigawatts.clearRestoreHooks();
+        assertEquals(0, Jigawatts.getRestoreHooks().size());
         
-        CheckpointRestore.readRestoreHooks(tmpDir.toString());
-        assertEquals(1, CheckpointRestore.getRestoreHooks().size());
-        assertEquals(data, ((TestHookA)CheckpointRestore.getRestoreHooks().get(0)).data);
-	CheckpointRestore.clearRestoreHooks();	
+        Jigawatts.readRestoreHooks(tmpDir.toString());
+        assertEquals(1, Jigawatts.getRestoreHooks().size());
+        assertEquals(data, ((TestHookA)Jigawatts.getRestoreHooks().get(0)).data);
+	Jigawatts.clearRestoreHooks();	
     }
 
 

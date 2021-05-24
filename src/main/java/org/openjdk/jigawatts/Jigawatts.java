@@ -1,20 +1,20 @@
 /*
  * Copyright 2021 Red Hat, Inc.
  *
- * This file is part of JavaCRIU.
+ * This file is part of Jigawatts.
  *
- * JavaCRIU is free software; you can redistribute it and/or modify
+ * Jigawatts is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
  * by the Free Software Foundation; either version 2, or (at your
  * option) any later version.
  *
- * JavaCRIU is distributed in the hope that it will be useful, but
+ * Jigawatts is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with JavaCRIU; see the file COPYING.  If not see
+ * along with Jigawatts; see the file COPYING.  If not see
  * <http://www.gnu.org/licenses/>.
  *
  * Linking this library statically or dynamically with other modules
@@ -36,7 +36,7 @@
  */
  
 
-package org.checkpoint;
+package org.openjdk.jigawatts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,9 +51,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 
-public class CheckpointRestore {
+public class Jigawatts {
 
-    private static final CheckpointRestore crContext;
+    private static final Jigawatts crContext;
 
     private static final List<Hook> checkpointHooks;
     private static final List<Hook> restoreHooks;
@@ -155,7 +155,7 @@ public class CheckpointRestore {
         String libraryName = System.mapLibraryName(library);
         String libraryFile = destDir + "/" + libraryName;
         
-        try (InputStream is = CheckpointRestore.class.getClassLoader().getResourceAsStream(libraryName);
+        try (InputStream is = Jigawatts.class.getClassLoader().getResourceAsStream(libraryName);
              FileOutputStream os = new FileOutputStream(libraryFile)) {
             
             byte[] buf = new byte[1024];
@@ -170,37 +170,22 @@ public class CheckpointRestore {
 
     static {
 
-//        System.out.println("Library path = " + System.getProperty("java.library.path"));
-//        System.out.println("About to load Checkpoint Restore library " + System.mapLibraryName("CheckpointRestore"));
-//        System.out.println("About to load criu library " + System.mapLibraryName("criu"));
-//        System.out.println("Before call to load CheckpointRestore");
-        
-        String libDir = "/tmp";
-        String tmpLib = libDir+ "/" + System.mapLibraryName("CheckpointRestore");
+        String libDir = System.getProperty("java.io.tmpdir");
+        String tmpLib = libDir+ "/" + System.mapLibraryName("Jigawatts");
         
         if (!Files.exists(Paths.get(tmpLib))) {
             try {
-                copyLibrary("CheckpointRestore", libDir);
+                copyLibrary("Jigawatts", libDir);
             } catch (IOException ex) {
-                throw new RuntimeException("can't initialize CheckpointRestore",ex);
+                throw new RuntimeException("can't initialize Jigawatts",ex);
             }
         }
         System.load(tmpLib);
         System.loadLibrary("criu");
-//        System.out.println("After call to load criu");
 
         checkpointHooks = new ArrayList<Hook>();
         restoreHooks = new ArrayList<Hook>();
-        crContext = new CheckpointRestore();
+        crContext = new Jigawatts();
         
-        // this won't work with newer jdks since libloading impl changed
-        try {
-            java.lang.reflect.Field libs
-                    = ClassLoader.class.getDeclaredField("loadedLibraryNames");
-            libs.setAccessible(true);
-            System.out.println(libs.get(ClassLoader.getSystemClassLoader()));
-        } catch (Exception e) {
-            System.out.println(e);
-        }
     }
 }

@@ -1,4 +1,4 @@
-import org.checkpoint.*;
+import org.openjdk.jigawatts.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -52,14 +52,14 @@ public class RandomTest {
     }
 
 	public static void TestRandomRestore() throws Exception {
-	    Path tmpDir = Paths.get("src","test","resources","checkpoint");
-	    CheckpointRestore.restoreTheWorld(tmpDir.toString());
+	    Path tmpDir = Paths.get("src","test","resources","jigawatts");
+	    Jigawatts.restoreTheWorld(tmpDir.toString());
 	}
 
 	public static void TestRandomCheckpoint() throws Exception {
 	    int upperBound = 100;
 	    long sampleSize = 10000;
-	    Path tmpDir = Paths.get("src","test","resources","checkpoint");	    
+	    Path tmpDir = Paths.get("src","test","resources","jigawatts");	    
 	    
 	    long testarray[] = new long[upperBound];
 
@@ -69,8 +69,8 @@ public class RandomTest {
             testarray[v] += 1;
         }
 
-	CheckpointRestore.registerRestoreHook(new AfterHook("That's all folks"));
-	CheckpointRestore.saveTheWorld(tmpDir.toString());
+	Jigawatts.registerRestoreHook(new AfterHook("That's all folks"));
+	Jigawatts.saveTheWorld(tmpDir.toString());
 	long end = System.currentTimeMillis();
 
 	PrintWriter os = new PrintWriter(new FileOutputStream(new File("src/test/resources/" + Long.toString(end))), true);	
@@ -117,7 +117,7 @@ public class RandomTest {
     @Test
     public void TestOne(@TempDir Path tmpDir) throws Exception {
 	// Checkpoint image files go here
-	Path tmpout = Paths.get("src","test","resources","checkpoint");
+	Path tmpout = Paths.get("src","test","resources","jigawatts");
 
 	Files.createDirectories(tmpout);
 	// Setup to run the test and checkpoint the results

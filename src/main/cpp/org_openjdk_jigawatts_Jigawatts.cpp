@@ -1,20 +1,20 @@
 /*
  * Copyright 2021 Red Hat, Inc.
  *
- * This file is part of JavaCRIU.
+ * This file is part of Jigawatts.
  *
- * JavaCRIU is free software; you can redistribute it and/or modify
+ * Jigawatts is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
  * by the Free Software Foundation; either version 2, or (at your
  * option) any later version.
  *
- * JavaCRIU is distributed in the hope that it will be useful, but
+ * Jigawatts is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with JavaCRIU; see the file COPYING.  If not see
+ * along with Jigawatts; see the file COPYING.  If not see
  * <http://www.gnu.org/licenses/>.
  *
  * Linking this library statically or dynamically with other modules
@@ -36,7 +36,7 @@
  */
  
 
-#include "org_checkpoint_CheckpointRestore.h"
+#include "org_openjdk_jigawatts_Jigawatts.h"
 #include <criu.h>
 #include <dirent.h>
 #include <errno.h>
@@ -54,11 +54,11 @@
 #include <unistd.h>
 
 /*
- * Class:     org_checkpoint_CheckpointRestore
+ * Class:     org_openjdk_jigawatts_Jigawatts
  * Method:    CheckTheWorldNative
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_checkTheWorldNative
+JNIEXPORT void JNICALL Java_org_openjdk_jigawatts_Jigawatts_checkTheWorldNative
 (JNIEnv *env, jobject obj)  {
 
     int init_result = criu_init_opts();
@@ -80,11 +80,11 @@ JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_checkTheWorldNative
 }
   
 /*
- * Class:     org_checkpoint_CheckpointRestore
+ * Class:     org_openjdk_jigawatts_Jigawatts
  * Method:    SaveTheWorldNative
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_saveTheWorldNative (JNIEnv * env, jobject jobj, jstring jstr) {
+JNIEXPORT void JNICALL Java_org_openjdk_jigawatts_Jigawatts_saveTheWorldNative (JNIEnv * env, jobject jobj, jstring jstr) {
     const char * path = env->GetStringUTFChars(jstr, NULL);
     struct stat st = {0};
 
@@ -127,11 +127,11 @@ JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_saveTheWorldNative 
 }
 
 /*
- * Class:     org_checkpoint_CheckpointRestore
+ * Class:     org_openjdk_jigawatts_Jigawatts
  * Method:    RestoreTheWorldNative
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_restoreTheWorldNative
+JNIEXPORT void JNICALL Java_org_openjdk_jigawatts_Jigawatts_restoreTheWorldNative
 (JNIEnv * env, jobject jobj, jstring jstr) {
     const char * path = env->GetStringUTFChars(jstr, NULL);  
     int fd = open(path, O_DIRECTORY);
@@ -169,18 +169,18 @@ JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_restoreTheWorldNati
 }
 
 /*
- * Class:     org_checkpoint_CheckpointRestore
+ * Class:     org_openjdk_jigawatts_Jigawatts
  * Method:    MigrateTheWorld
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_migrateTheWorld
+JNIEXPORT void JNICALL Java_org_openjdk_jigawatts_Jigawatts_migrateTheWorld
   (JNIEnv *, jclass);
 
 /*
- * Class:     org_checkpoint_CheckpointRestore
+ * Class:     org_openjdk_jigawatts_Jigawatts
  * Method:    SaveTheWorldIncremental
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_checkpoint_CheckpointRestore_saveTheWorldIncremental
+JNIEXPORT void JNICALL Java_org_openjdk_jigawatts_Jigawatts_saveTheWorldIncremental
   (JNIEnv *, jclass);
 
