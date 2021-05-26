@@ -1,4 +1,4 @@
-# JavaCriuJar
+# jigawatts
 
 Build a jar file for easier access to CRIU from Java
 
@@ -16,7 +16,10 @@ Caveats:
 ## Building with Maven (experimental)
 
 ```
- $ cd JavaCriuJar
+ $ mvn clean install
+```
+Is usually enough, but on some systems you need to go with root
+```
  $ sudo mvn clean verify
-
+```
 
