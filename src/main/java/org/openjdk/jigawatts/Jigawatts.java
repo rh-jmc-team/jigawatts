@@ -65,25 +65,25 @@ public class Jigawatts {
 
     private native void checkTheWorldNative();
 
-    private native void saveTheWorldNative(String dir);
+    private native void saveTheWorldNative(String dir, boolean leaveRunning);
 
     private native void restoreTheWorldNative(String dir);
-
-    public static native void migrateTheWorld();
-
-    public static native void saveTheWorldIncremental();
 
     public static void checkTheWorld() {
         crContext.checkTheWorldNative();
     }
 
-    public static void saveTheWorld(String dir) throws IOException {
+    public static void saveTheWorld(String dir, boolean leaveRunning) throws IOException {
         for (Hook h : checkpointHooks) {
             h.run();
         }
 
         writeRestoreHooks(dir);
-        crContext.saveTheWorldNative(dir);
+        crContext.saveTheWorldNative(dir, leaveRunning);
+    }
+
+    public static void saveTheWorld(String dir) throws IOException {
+	saveTheWorld(dir, true);
     }
 
     public static void writeRestoreHooks(String dir) throws IOException {
