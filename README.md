@@ -13,6 +13,15 @@ Caveats:
    
    You must run tests as root.  CRIU will run in user mode eventually, but not everywhere yet.
 
+## Building with autotools
+
+```
+$ mkdir <build_dir>
+$ <src_dir>/configure --prefix=<install prefix>
+$ make
+$ make install
+```
+
 ## Building with Maven (experimental)
 
 ```
