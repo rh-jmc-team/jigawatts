@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Build-Jdk-Spec: @JDK_VERSION@
+JavaPackages-GroupId: @GROUP@
+JavaPackages-ArtifactId: @ARTIFACT@
+JavaPackages-Version: @PACKAGE_VERSION@
