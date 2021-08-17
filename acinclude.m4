@@ -1,19 +1,19 @@
 dnl Copyright 2021 Red Hat, Inc.
 dnl
-dnl This file is part of Jigawatt.
+dnl This file is part of Jigawatts.
 dnl
-dnl Jigawatt is free software; you can redistribute it and/or modify
+dnl Jigawatts is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published
 dnl by the Free Software Foundation; either version 2, or (at your
 dnl option) any later version.
 dnl
-dnl Jigawatt is distributed in the hope that it will be useful, but
+dnl Jigawatts is distributed in the hope that it will be useful, but
 dnl WITHOUT ANY WARRANTY; without even the implied warranty of
 dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 dnl General Public License for more details.
 dnl
 dnl You should have received a copy of the GNU General Public License
-dnl along with Jigawatt; see the file COPYING.  If not see
+dnl along with Jigawatts; see the file COPYING.  If not see
 dnl <http://www.gnu.org/licenses/>.
 dnl
 dnl Linking this library statically or dynamically with other modules
