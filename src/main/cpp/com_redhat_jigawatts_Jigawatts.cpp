@@ -36,7 +36,7 @@
  */
  
 
-#include "org_openjdk_jigawatts_Jigawatts.h"
+#include "com_redhat_jigawatts_Jigawatts.h"
 #include <criu.h>
 #include <dirent.h>
 #include <errno.h>
@@ -54,11 +54,11 @@
 #include <unistd.h>
 
 /*
- * Class:     org_openjdk_jigawatts_Jigawatts
+ * Class:     com_redhat_jigawatts_Jigawatts
  * Method:    CheckTheWorldNative
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_openjdk_jigawatts_Jigawatts_checkTheWorldNative
+JNIEXPORT void JNICALL Java_com_redhat_jigawatts_Jigawatts_checkTheWorldNative
 (JNIEnv *env, jobject obj)  {
 
   int init_result = criu_init_opts();
@@ -80,11 +80,11 @@ JNIEXPORT void JNICALL Java_org_openjdk_jigawatts_Jigawatts_checkTheWorldNative
 }
   
 /*
- * Class:     org_openjdk_jigawatts_Jigawatts
+ * Class:     com_redhat_jigawatts_Jigawatts
  * Method:    saveTheWorldNative
  * Signature: (Ljava/lang/String;Ljava/lang/Boolean;)V
  */
-JNIEXPORT void JNICALL Java_org_openjdk_jigawatts_Jigawatts_saveTheWorldNative
+JNIEXPORT void JNICALL Java_com_redhat_jigawatts_Jigawatts_saveTheWorldNative
 (JNIEnv * env, jobject jobj, jstring jstr, jboolean leaveRunning) {
   const char * path = env->GetStringUTFChars(jstr, NULL);
   struct stat st = {0};
@@ -133,11 +133,11 @@ JNIEXPORT void JNICALL Java_org_openjdk_jigawatts_Jigawatts_saveTheWorldNative
 }
 
 /*
- * Class:     org_openjdk_jigawatts_Jigawatts
+ * Class:     com_redhat_jigawatts_Jigawatts
  * Method:    RestoreTheWorldNative
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_org_openjdk_jigawatts_Jigawatts_restoreTheWorldNative
+JNIEXPORT void JNICALL Java_com_redhat_jigawatts_Jigawatts_restoreTheWorldNative
 (JNIEnv * env, jobject jobj, jstring jstr) {
   const char * path = env->GetStringUTFChars(jstr, NULL);  
   int fd = open(path, O_DIRECTORY);
@@ -175,18 +175,18 @@ JNIEXPORT void JNICALL Java_org_openjdk_jigawatts_Jigawatts_restoreTheWorldNativ
 }
 
 /*
- * Class:     org_openjdk_jigawatts_Jigawatts
+ * Class:     com_redhat_jigawatts_Jigawatts
  * Method:    MigrateTheWorld
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_openjdk_jigawatts_Jigawatts_migrateTheWorld
+JNIEXPORT void JNICALL Java_com_redhat_jigawatts_Jigawatts_migrateTheWorld
 (JNIEnv *, jclass);
 
 /*
- * Class:     org_openjdk_jigawatts_Jigawatts
+ * Class:     com_redhat_jigawatts_Jigawatts
  * Method:    SaveTheWorldIncremental
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_openjdk_jigawatts_Jigawatts_saveTheWorldIncremental
+JNIEXPORT void JNICALL Java_com_redhat_jigawatts_Jigawatts_saveTheWorldIncremental
 (JNIEnv *, jclass);
 

@@ -1,4 +1,4 @@
-import org.openjdk.jigawatts.*;
+import com.redhat.jigawatts.*;
 
 import java.io.IOException;
 import java.io.OutputStream;

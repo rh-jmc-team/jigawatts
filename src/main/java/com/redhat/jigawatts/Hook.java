@@ -36,7 +36,7 @@
  */
  
 
-package org.openjdk.jigawatts;
+package com.redhat.jigawatts;
 
 import java.io.Serializable;
 
