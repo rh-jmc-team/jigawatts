@@ -40,7 +40,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.openjdk</groupId>
+    <groupId>com.redhat</groupId>
     <artifactId>jigawatts</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -87,7 +87,7 @@
                                 <arg>${project.build.directory}/native/javah</arg>
                             </compilerArgs>
                             <includes>
-                                 <include>org/openjdk/jigawatts/Jigawatts.java</include>
+                                 <include>com/redhat/jigawatts/Jigawatts.java</include>
                             </includes>
                       </configuration>
                    </execution>
@@ -125,7 +125,7 @@
                                 <argument>-I${project.build.directory}/native/javah</argument>
                                 <argument>-lcriu</argument>
                                 <argument>-o${project.build.outputDirectory}/libJigawatts.so</argument>
-                                <argument>${project.basedir}/src/main/cpp/org_openjdk_jigawatts_Jigawatts.cpp</argument>
+                                <argument>${project.basedir}/src/main/cpp/com_redhat_jigawatts_Jigawatts.cpp</argument>
                             </arguments>
                         </configuration>
                     </execution>

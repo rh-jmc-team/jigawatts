@@ -41,7 +41,7 @@ JIGA_NATIVE_SRCDIR = $(JIGA_SRCDIR)/cpp
 JIGA_JAVA_SRCDIR = $(JIGA_SRCDIR)/java
 JIGA_MAVEN_DIR = META-INF/maven/$(GROUP)/$(ARTIFACT)
 
-JIGA_NATIVE_FUNCS = org/openjdk/jigawatts/Jigawatts.java
+JIGA_NATIVE_FUNCS = com/redhat/jigawatts/Jigawatts.java
 JIGA_NATIVE_HDRS = $(subst .java,.h,$(subst /,_,$(JIGA_NATIVE_FUNCS)))
 JIGA_NATIVE_SRC = $(subst .java,.cpp,$(subst /,_,$(JIGA_NATIVE_FUNCS)))
 JIGA_NATIVE_OBJS = $(subst .cpp,.o,$(JIGA_NATIVE_SRC))
