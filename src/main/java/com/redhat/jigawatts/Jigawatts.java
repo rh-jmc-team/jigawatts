@@ -38,6 +38,7 @@
 
 package com.redhat.jigawatts;
 
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -150,10 +151,19 @@ public class Jigawatts {
         return Collections.unmodifiableList(crContext.restoreHooks);
     }
 
-    private static void copyLibrary(String library, File desFile) throws IOException {
+    private static URL getInternalLibrary() throws IOException {
         String libraryName = System.mapLibraryName("Jigawatts");
+        return Jigawatts.class.getClassLoader().getResource(libraryName);
+    }
+
+    private static InputStream getInternalLibraryStream() throws IOException {
+        return getInternalLibrary().openStream();
+    }
+
+    private static void copyLibrary(String library, File desFile) throws IOException {
         jigaLog("Extracting internal libray to " + desFile.getAbsolutePath());
-        try (InputStream is = Jigawatts.class.getClassLoader().getResourceAsStream(libraryName);
+        jigaLog("Interal library is: " + getInternalLibrary().toExternalForm());
+        try (InputStream is = getInternalLibraryStream();
              FileOutputStream os = new FileOutputStream(desFile)) {
             byte[] buf = new byte[1024];
             int bytesRead;
@@ -181,17 +191,17 @@ public class Jigawatts {
         return "true".equalsIgnoreCase(getPropertyOrVar(VERBOSE_PROP));
     }
 
-    private static String getInternalLibraryFile() {
+    private static String getInternalLibraryExtractedFile() {
         return getPropertyOrVar(LIBRARY_TARGETFILE_PROP);
     }
 
     private static void loadInJarLibrary() {
         File tmpLibrary = null;
         try {
-            if (getInternalLibraryFile() == null) {
+            if (getInternalLibraryExtractedFile() == null) {
                 tmpLibrary = File.createTempFile("jigawatts", ".so");
             } else {
-                tmpLibrary = new File(getInternalLibraryFile());
+                tmpLibrary = new File(getInternalLibraryExtractedFile());
             }
             if (!(tmpLibrary.exists() && tmpLibrary.length() > 0)) {
                 copyLibrary("Jigawatts", tmpLibrary);
@@ -216,7 +226,7 @@ public class Jigawatts {
 
     public static void main(String... args) {
         System.out.println("Native library loaded!");
-        System.out.println(LIBRARY_TARGETFILE_PROP + ": " + getInternalLibraryFile());
+        System.out.println(LIBRARY_TARGETFILE_PROP + ": " + getInternalLibraryExtractedFile());
         System.out.println(VERBOSE_PROP + ": " + getVerbose());
     }
 
