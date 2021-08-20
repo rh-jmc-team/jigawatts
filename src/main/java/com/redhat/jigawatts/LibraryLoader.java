@@ -5,6 +5,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Date;
 
 class LibraryLoader {
 
@@ -32,7 +37,19 @@ class LibraryLoader {
 
     private static void jigaLog(String s) {
         if (getVerbose()) {
-            System.err.println(s);
+            if (getVerboseFile() == null) {
+                System.err.println(s);
+            } else {
+                Path logPath = Paths.get(getVerboseFile());
+                try {
+                    if (!logPath.toFile().exists()){
+                        logPath.toFile().createNewFile();
+                    }
+                    Files.write(logPath, ("[" + new Date().toString() + "] " + s + "\n").getBytes(), StandardOpenOption.APPEND);
+                } catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }
         }
     }
 
@@ -57,6 +74,10 @@ class LibraryLoader {
 
     private static boolean getVerbose() {
         return "true".equalsIgnoreCase(getPropertyOrVar(VERBOSE_PROP));
+    }
+
+    private static String getVerboseFile() {
+        return getPropertyOrVar(VERBOSE_FILE_PROP);
     }
 
     private static String getInternalLibraryExtractedFile() {
@@ -104,6 +125,7 @@ class LibraryLoader {
     private static final String LIBRARY_TARGETFILE_PROP = "jigawatts.library.targetfile";
     private static final String LIBRARY_EXTERNAL_PROP = "jigawatts.library";
     private static final String VERBOSE_PROP = "jigawatts.verbose";
+    private static final String VERBOSE_FILE_PROP = "jigawatts.verbose.file";
     private static final String SYSTEM_LIB_SWITCH = "SYSTEM";
 
     static void loadLibrary() {
@@ -135,6 +157,7 @@ class LibraryLoader {
         System.out.println(LIBRARY_TARGETFILE_PROP + ": " + getInternalLibraryExtractedFile());
         System.out.println(LIBRARY_EXTERNAL_PROP + ": " + getExternalLibraryFile());
         System.out.println("You may  use " + SYSTEM_LIB_SWITCH + " to force search of system library with internal library present");
+        System.out.println(VERBOSE_FILE_PROP + ": " + getVerboseFile());
         System.out.println(VERBOSE_PROP + ": " + getVerbose());
     }
 }
