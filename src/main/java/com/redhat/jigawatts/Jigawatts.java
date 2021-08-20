@@ -38,6 +38,7 @@
 
 package com.redhat.jigawatts;
 
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
@@ -47,7 +48,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 
@@ -141,55 +141,83 @@ public class Jigawatts {
     static void clearRestoreHooks() {
         crContext.restoreHooks.clear();
     }
-    
+
     static List<Hook> getCheckpointHooks() {
         return Collections.unmodifiableList(crContext.checkpointHooks);
     }
-    
+
     static List<Hook> getRestoreHooks() {
         return Collections.unmodifiableList(crContext.restoreHooks);
     }
 
-    private static void copyLibrary(String library, String destDir) throws IOException {
-        
-        String libraryName = System.mapLibraryName(library);
-        String libraryFile = destDir + "/" + libraryName;
-        
+    private static void copyLibrary(String library, File desFile) throws IOException {
+        String libraryName = System.mapLibraryName("Jigawatts");
+        jigaLog("Extracting internal libray to " + desFile.getAbsolutePath());
         try (InputStream is = Jigawatts.class.getClassLoader().getResourceAsStream(libraryName);
-             FileOutputStream os = new FileOutputStream(libraryFile)) {
-            
+             FileOutputStream os = new FileOutputStream(desFile)) {
             byte[] buf = new byte[1024];
-
             int bytesRead;
-
             while ((bytesRead = is.read(buf)) > 0) {
                 os.write(buf, 0, bytesRead);
             }
         }
     }
 
-    private static void loadInJarLibrary() {
-        String libDir = System.getProperty("java.io.tmpdir");
-        String tmpLib = libDir+ "/" + System.mapLibraryName("Jigawatts");
-
-        if (!Files.exists(Paths.get(tmpLib))) {
-            try {
-                copyLibrary("Jigawatts", libDir);
-            } catch (IOException ex) {
-                throw new RuntimeException("can't initialize Jigawatts",ex);
-            }
+    private static void jigaLog(String s) {
+        if (getVerbose()) {
+            System.err.println(s);
         }
-        System.load(tmpLib);
+    }
+
+    private static String getPropertyOrVar(String s) {
+        String prop = System.getProperty(s);
+        if (prop != null) {
+            return prop;
+        }
+        return System.getenv(s.toUpperCase().replace(".", "_"));
+    }
+
+    private static boolean getVerbose() {
+        return "true".equalsIgnoreCase(getPropertyOrVar(VERBOSE_PROP));
+    }
+
+    private static String getInternalLibraryFile() {
+        return getPropertyOrVar(LIBRARY_TARGETFILE_PROP);
+    }
+
+    private static void loadInJarLibrary() {
+        File tmpLibrary = null;
+        try {
+            if (getInternalLibraryFile() == null) {
+                tmpLibrary = File.createTempFile("jigawatts", ".so");
+            } else {
+                tmpLibrary = new File(getInternalLibraryFile());
+            }
+            if (!(tmpLibrary.exists() && tmpLibrary.length() > 0)) {
+                copyLibrary("Jigawatts", tmpLibrary);
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException("can't initialize Jigawatts", ex);
+        }
+        jigaLog("Loading internal libray from " + tmpLibrary.getAbsolutePath());
+        System.load(tmpLibrary.getAbsolutePath());
         System.loadLibrary("criu");
     }
 
     static {
-
-       loadInJarLibrary();
+        loadInJarLibrary();
         checkpointHooks = new ArrayList<Hook>();
         restoreHooks = new ArrayList<Hook>();
         crContext = new Jigawatts();
-        
+    }
+
+    private static final String LIBRARY_TARGETFILE_PROP = "jigawatts.library.targetfile";
+    private static final String VERBOSE_PROP = "jigawatts.verbose";
+
+    public static void main(String... args) {
+        System.out.println("Native library loaded!");
+        System.out.println(LIBRARY_TARGETFILE_PROP + ": " + getInternalLibraryFile());
+        System.out.println(VERBOSE_PROP + ": " + getVerbose());
     }
 
 }
