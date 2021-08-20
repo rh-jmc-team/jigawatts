@@ -168,11 +168,10 @@ public class Jigawatts {
         }
     }
 
-    static {
-
+    private static void loadInJarLibrary() {
         String libDir = System.getProperty("java.io.tmpdir");
         String tmpLib = libDir+ "/" + System.mapLibraryName("Jigawatts");
-        
+
         if (!Files.exists(Paths.get(tmpLib))) {
             try {
                 copyLibrary("Jigawatts", libDir);
@@ -182,10 +181,15 @@ public class Jigawatts {
         }
         System.load(tmpLib);
         System.loadLibrary("criu");
+    }
 
+    static {
+
+       loadInJarLibrary();
         checkpointHooks = new ArrayList<Hook>();
         restoreHooks = new ArrayList<Hook>();
         crContext = new Jigawatts();
         
     }
+
 }
