@@ -182,9 +182,20 @@ public class Jigawatts {
     private static String getPropertyOrVar(String s) {
         String prop = System.getProperty(s);
         if (prop != null) {
-            return prop;
+            return trimToNull(prop);
         }
-        return System.getenv(s.toUpperCase().replace(".", "_"));
+        return trimToNull(System.getenv(s.toUpperCase().replace(".", "_")));
+    }
+
+    private static String trimToNull(String s) {
+        if (s == null) {
+            return null;
+        }
+        s = s.trim();
+        if (s.isEmpty()) {
+            return null;
+        }
+        return s;
     }
 
     private static boolean getVerbose() {
