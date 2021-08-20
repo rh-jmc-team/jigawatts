@@ -151,7 +151,7 @@ public class Jigawatts {
         return Collections.unmodifiableList(crContext.restoreHooks);
     }
 
-    private static URL getInternalLibrary() throws IOException {
+    private static URL getInternalLibrary() {
         String libraryName = System.mapLibraryName("Jigawatts");
         return Jigawatts.class.getClassLoader().getResource(libraryName);
     }
@@ -195,6 +195,10 @@ public class Jigawatts {
         return getPropertyOrVar(LIBRARY_TARGETFILE_PROP);
     }
 
+    private static String getExternalLibraryFile() {
+        return getPropertyOrVar(LIBRARY_EXTERNAL_PROP);
+    }
+
     private static void loadInJarLibrary() {
         File tmpLibrary = null;
         try {
@@ -211,22 +215,61 @@ public class Jigawatts {
         }
         jigaLog("Loading internal libray from " + tmpLibrary.getAbsolutePath());
         System.load(tmpLibrary.getAbsolutePath());
-        System.loadLibrary("criu");
     }
 
+    private static void loadSystemLib() {
+        String lib = System.mapLibraryName("Jigawatts");
+        jigaLog("Loading system library " + lib);
+        for (String path : System.getProperty("java.library.path").split(":")) {
+            try {
+                String libPath = path + File.separator + lib;
+                System.load(libPath);
+                jigaLog("Loaded system library: " + libPath);
+                return;
+            } catch (UnsatisfiedLinkError e) {
+                continue;
+            }
+        }
+        throw new RuntimeException(lib + " library not found on java.library.path/LD_LIBRARY_PATH!");
+    }
+
+    private static final String LIBRARY_TARGETFILE_PROP = "jigawatts.library.targetfile";
+    private static final String LIBRARY_EXTERNAL_PROP = "jigawatts.library";
+    private static final String VERBOSE_PROP = "jigawatts.verbose";
+    private static final String SYSTEM_LIB_SWITCH = "SYSTEM";
+
     static {
-        loadInJarLibrary();
+        if (getInternalLibrary() == null) {
+            jigaLog("Internal library missing!");
+            if (getExternalLibraryFile() == null) {
+                loadSystemLib();
+            } else {
+                System.load(getExternalLibraryFile());
+                jigaLog("Loaded custom library: " + getExternalLibraryFile());
+            }
+        } else {
+            jigaLog("Internal library present");
+            if (getExternalLibraryFile() == null) {
+                loadInJarLibrary();
+            } else if (SYSTEM_LIB_SWITCH.equals(getExternalLibraryFile())) {
+                loadSystemLib();
+            } else {
+                jigaLog("Loading custom library: " + getExternalLibraryFile());
+                System.load(getExternalLibraryFile());
+            }
+        }
+        System.loadLibrary("criu");
         checkpointHooks = new ArrayList<Hook>();
         restoreHooks = new ArrayList<Hook>();
         crContext = new Jigawatts();
     }
 
-    private static final String LIBRARY_TARGETFILE_PROP = "jigawatts.library.targetfile";
-    private static final String VERBOSE_PROP = "jigawatts.verbose";
 
     public static void main(String... args) {
         System.out.println("Native library loaded!");
         System.out.println(LIBRARY_TARGETFILE_PROP + ": " + getInternalLibraryExtractedFile());
+        System.out.println(LIBRARY_EXTERNAL_PROP + ": " + getExternalLibraryFile());
+        System.out.println("You may  use " + SYSTEM_LIB_SWITCH + " to force search of system library with internal library present");
         System.out.println(VERBOSE_PROP + ": " + getVerbose());
     }
 
