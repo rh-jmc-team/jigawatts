@@ -9,3 +9,14 @@ config.sub
 configure
 install-sh
 missing
+
+.idea/
+MANIFEST.MF
+Makefile
+autotools.pom.properties
+pom.properties
+build/
+config.log
+config.status
+jigawatts.iml
+

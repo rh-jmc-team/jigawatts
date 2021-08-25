@@ -38,7 +38,7 @@ AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([1.9 tar-pax foreign])
 AM_MAINTAINER_MODE([enable])
-AC_CONFIG_FILES([Makefile pom.properties MANIFEST.MF])
+AC_CONFIG_FILES([Makefile autotools.pom.properties MANIFEST.MF])
 
 AC_PROG_CC
 

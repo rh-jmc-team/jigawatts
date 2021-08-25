@@ -38,6 +38,7 @@
 
 package com.redhat.jigawatts;
 
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
@@ -46,8 +47,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 
@@ -141,51 +140,23 @@ public class Jigawatts {
     static void clearRestoreHooks() {
         crContext.restoreHooks.clear();
     }
-    
+
     static List<Hook> getCheckpointHooks() {
         return Collections.unmodifiableList(crContext.checkpointHooks);
     }
-    
+
     static List<Hook> getRestoreHooks() {
         return Collections.unmodifiableList(crContext.restoreHooks);
     }
 
-    private static void copyLibrary(String library, String destDir) throws IOException {
-        
-        String libraryName = System.mapLibraryName(library);
-        String libraryFile = destDir + "/" + libraryName;
-        
-        try (InputStream is = Jigawatts.class.getClassLoader().getResourceAsStream(libraryName);
-             FileOutputStream os = new FileOutputStream(libraryFile)) {
-            
-            byte[] buf = new byte[1024];
-
-            int bytesRead;
-
-            while ((bytesRead = is.read(buf)) > 0) {
-                os.write(buf, 0, bytesRead);
-            }
-        }
-    }
-
     static {
-
-        String libDir = System.getProperty("java.io.tmpdir");
-        String tmpLib = libDir+ "/" + System.mapLibraryName("Jigawatts");
-        
-        if (!Files.exists(Paths.get(tmpLib))) {
-            try {
-                copyLibrary("Jigawatts", libDir);
-            } catch (IOException ex) {
-                throw new RuntimeException("can't initialize Jigawatts",ex);
-            }
-        }
-        System.load(tmpLib);
-        System.loadLibrary("criu");
-
+        LibraryLoader.loadLibrary();
         checkpointHooks = new ArrayList<Hook>();
         restoreHooks = new ArrayList<Hook>();
         crContext = new Jigawatts();
-        
+    }
+
+    public static void main(String... args) {
+        LibraryLoader.sayHello();
     }
 }
