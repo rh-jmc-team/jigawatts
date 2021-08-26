@@ -23,8 +23,8 @@ class LibraryLoader {
     }
 
     private static void copyLibrary(String library, File desFile) throws IOException {
-        jigaLog("Extracting internal libray to " + desFile.getAbsolutePath());
-        jigaLog("Interal library is: " + getInternalLibrary().toExternalForm());
+        jigaLog("Extracting internal library to " + desFile.getAbsolutePath());
+        jigaLog("Internal library is: " + getInternalLibrary().toExternalForm());
         try (InputStream is = getInternalLibraryStream();
              FileOutputStream os = new FileOutputStream(desFile)) {
             byte[] buf = new byte[1024];
@@ -102,7 +102,7 @@ class LibraryLoader {
         } catch (IOException ex) {
             throw new RuntimeException("can't initialize Jigawatts", ex);
         }
-        jigaLog("Loading internal libray from " + tmpLibrary.getAbsolutePath());
+        jigaLog("Loading internal library from " + tmpLibrary.getAbsolutePath());
         System.load(tmpLibrary.getAbsolutePath());
     }
 
