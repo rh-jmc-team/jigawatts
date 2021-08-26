@@ -23,8 +23,8 @@ class LibraryLoader {
     }
 
     private static void copyLibrary(String library, File desFile) throws IOException {
-        jigaLog("Extracting internal libray to " + desFile.getAbsolutePath());
-        jigaLog("Interal library is: " + getInternalLibrary().toExternalForm());
+        jigaLog("Extracting internal library to " + desFile.getAbsolutePath());
+        jigaLog("Internal library is: " + getInternalLibrary().toExternalForm());
         try (InputStream is = getInternalLibraryStream();
              FileOutputStream os = new FileOutputStream(desFile)) {
             byte[] buf = new byte[1024];
@@ -58,10 +58,14 @@ class LibraryLoader {
         if (prop != null) {
             return trimToNull(prop);
         }
-        return trimToNull(System.getenv(s.toUpperCase().replace(".", "_")));
+        return trimToNull(System.getenv(propertyToVar(s)));
     }
 
-    private static String trimToNull(String s) {
+    static String propertyToVar(String s) {
+        return s.toUpperCase().replace(".", "_");
+    }
+
+    static String trimToNull(String s) {
         if (s == null) {
             return null;
         }
@@ -102,7 +106,7 @@ class LibraryLoader {
         } catch (IOException ex) {
             throw new RuntimeException("can't initialize Jigawatts", ex);
         }
-        jigaLog("Loading internal libray from " + tmpLibrary.getAbsolutePath());
+        jigaLog("Loading internal library from " + tmpLibrary.getAbsolutePath());
         System.load(tmpLibrary.getAbsolutePath());
     }
 
@@ -152,12 +156,21 @@ class LibraryLoader {
     }
 
 
+    private static String PROP = "-D";
+    private static String VAR = "$";
+
     static void sayHello() {
         System.out.println("Native library loaded!");
-        System.out.println(LIBRARY_TARGETFILE_PROP + ": " + getInternalLibraryExtractedFile());
-        System.out.println(LIBRARY_EXTERNAL_PROP + ": " + getExternalLibraryFile());
-        System.out.println("You may  use " + SYSTEM_LIB_SWITCH + " to force search of system library with internal library present");
-        System.out.println(VERBOSE_FILE_PROP + ": " + getVerboseFile());
-        System.out.println(VERBOSE_PROP + ": " + getVerbose());
+        System.out.println("If jigawatts is packed with embedded dynamic library, it is used in advance. If it is missing, the system library is searched for.");
+        System.out.println("To change the loading of native bits you can use following properties/variables. Property is used with priority.");
+        System.out.println(" * The internal library will be unpacked and loaded from given file. If given file exists, it is not overwritten");
+        System.out.println("    " + PROP + LIBRARY_TARGETFILE_PROP + "/" + VAR + propertyToVar(LIBRARY_TARGETFILE_PROP) + ": " + getInternalLibraryExtractedFile());
+        System.out.println(" * The internal library will not be used, given file will be used");
+        System.out.println("    " + PROP + LIBRARY_EXTERNAL_PROP + "/" + VAR + propertyToVar(LIBRARY_EXTERNAL_PROP) + ": " + getExternalLibraryFile());
+        System.out.println("   You may use value of " + SYSTEM_LIB_SWITCH + " to force search of system library even with internal library present");
+        System.out.println(" * This switch can set library loading logging to 'true'");
+        System.out.println("    " + PROP + VERBOSE_FILE_PROP + "/" + VAR + propertyToVar(VERBOSE_FILE_PROP) + ": " + getVerboseFile());
+        System.out.println(" * This switch can set library loading logging to append to exact file instead of stderr");
+        System.out.println("    " + PROP + VERBOSE_PROP + "/" + VAR + propertyToVar(VERBOSE_PROP) + ": " + getVerbose());
     }
 }
