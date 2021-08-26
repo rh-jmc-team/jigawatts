@@ -93,6 +93,7 @@ class LibraryLoader {
         try {
             if (getInternalLibraryExtractedFile() == null) {
                 tmpLibrary = File.createTempFile("jigawatts", ".so");
+                tmpLibrary.deleteOnExit();
             } else {
                 tmpLibrary = new File(getInternalLibraryExtractedFile());
             }
