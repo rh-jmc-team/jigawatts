@@ -47,6 +47,7 @@ JIGA_NATIVE_SRC = $(subst .java,.cpp,$(subst /,_,$(JIGA_NATIVE_FUNCS)))
 JIGA_NATIVE_OBJS = $(subst .cpp,.o,$(JIGA_NATIVE_SRC))
 JIGA_LIB = libJigawatts.so
 JIGA_JAR = $(ARTIFACT).jar
+JAVA_ROOT_DIR = $(word 1, $(subst /, ,$(JIGA_NATIVE_FUNCS)))
 
 LICENSE_DIR = $(datadir)/licenses/$(PACKAGE)
 JAVADOC_DIR = $(datadir)/javadoc/$(PACKAGE)
@@ -83,7 +84,7 @@ $(JIGA_STAMPDIR)/classes.stamp: $(JIGA_BUILDDIR)/source-files.txt
 
 clean-classes-and-headers:
 	$(RM) $(addprefix $(JIGA_INCLUDEDIR)/,$(JIGA_NATIVE_HDRS))
-	$(RM) -r $(JIGA_BUILDDIR)/org
+	$(RM) -r $(JIGA_BUILDDIR)/$(JAVA_ROOT_DIR)
 	$(RM) $(JIGA_STAMPDIR)/classes.stamp
 
 $(JIGA_BUILDDIR)/%.o: $(JIGA_NATIVE_SRCDIR)/%.cpp
@@ -104,8 +105,9 @@ clean-lib:
 $(JIGA_BUILDDIR)/$(JIGA_JAR): $(JIGA_STAMPDIR)/classes.stamp
 	cd $(JIGA_BUILDDIR) && \
 	  $(MKDIR_P) $(JIGA_MAVEN_DIR) && \
-	  cp $(abs_top_srcdir)/pom.xml $(abs_top_builddir)/autotools.pom.properties $(JIGA_MAVEN_DIR) && \
-	  $(SYSTEM_JDK_DIR)/bin/jar -cvfm $(JIGA_JAR) $(abs_top_builddir)/MANIFEST.MF ./org META-INF
+	  cp $(abs_top_srcdir)/pom.xml $(JIGA_MAVEN_DIR) && \
+	  cp $(abs_top_builddir)/autotools.pom.properties $(JIGA_MAVEN_DIR)/pom.properties && \
+	  $(SYSTEM_JDK_DIR)/bin/jar -cvfm $(JIGA_JAR) $(abs_top_builddir)/MANIFEST.MF ./$(JAVA_ROOT_DIR) META-INF
 
 clean-jar:
 	$(RM) $(JIGA_BUILDDIR)/$(JIGA_JAR)
