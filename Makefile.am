@@ -105,7 +105,8 @@ clean-lib:
 $(JIGA_BUILDDIR)/$(JIGA_JAR): $(JIGA_STAMPDIR)/classes.stamp
 	cd $(JIGA_BUILDDIR) && \
 	  $(MKDIR_P) $(JIGA_MAVEN_DIR) && \
-	  cp $(abs_top_srcdir)/pom.xml $(abs_top_builddir)/autotools.pom.properties $(JIGA_MAVEN_DIR) && \
+	  cp $(abs_top_srcdir)/pom.xml $(JIGA_MAVEN_DIR) && \
+	  cp $(abs_top_builddir)/autotools.pom.properties $(JIGA_MAVEN_DIR)/pom.properties && \
 	  $(SYSTEM_JDK_DIR)/bin/jar -cvfm $(JIGA_JAR) $(abs_top_builddir)/MANIFEST.MF ./$(JAVA_ROOT_DIR) META-INF
 
 clean-jar:
