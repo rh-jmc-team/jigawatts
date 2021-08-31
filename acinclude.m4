@@ -57,11 +57,17 @@ AC_DEFUN_ONCE([JW_CHECK_FOR_JDK],
               ])
   if test -z "${SYSTEM_JDK_DIR}"; then
     AC_MSG_RESULT([not specified])
+    OPENJDK17_VMS="/usr/lib/jvm/icedtea-17 /usr/lib/jvm/java-17-openjdk
+    		  /usr/lib/jvm/java-17-openjdk.${RPM_ARCH} /usr/lib64/jvm/java-17-openjdk
+		  /usr/lib/jvm/java-17 /usr/lib/jvm/java-17-openjdk"
+    OPENJDK11_VMS="/usr/lib/jvm/icedtea-11 /usr/lib/jvm/java-11-openjdk
+    		  /usr/lib/jvm/java-11-openjdk.${RPM_ARCH} /usr/lib64/jvm/java-11-openjdk
+		  /usr/lib/jvm/java-11 /usr/lib/jvm/java-11-openjdk"
     OPENJDK8_VMS="/usr/lib/jvm/icedtea-8 /usr/lib/jvm/java-1.8.0-openjdk
     		  /usr/lib/jvm/java-1.8.0-openjdk.${RPM_ARCH} /usr/lib64/jvm/java-1.8.0-openjdk
 		  /usr/lib/jvm/java-1.8.0 /usr/lib/jvm/java-8-openjdk"
     for dir in /usr/lib/jvm/java-openjdk /usr/lib/jvm/openjdk /usr/lib/jvm/java-icedtea \
-	       /etc/alternatives/java_sdk_openjdk ${OPENJDK8_VMS} /usr/lib/jvm/java ; do
+	       /etc/alternatives/java_sdk_openjdk ${OPENJDK11_VMS} ${OPENJDK17_VMS} /usr/lib/jvm/java ${OPENJDK8_VMS} ; do
        AC_MSG_CHECKING([for ${dir}]);
        if test -d $dir; then
          SYSTEM_JDK_DIR=$dir ;
