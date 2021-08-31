@@ -61,7 +61,7 @@ AC_DEFUN_ONCE([JW_CHECK_FOR_JDK],
     		  /usr/lib/jvm/java-1.8.0-openjdk.${RPM_ARCH} /usr/lib64/jvm/java-1.8.0-openjdk
 		  /usr/lib/jvm/java-1.8.0 /usr/lib/jvm/java-8-openjdk"
     for dir in /usr/lib/jvm/java-openjdk /usr/lib/jvm/openjdk /usr/lib/jvm/java-icedtea \
-	       /etc/alternatives/java_sdk_openjdk ${OPENJDK8_VMS} ; do
+	       /etc/alternatives/java_sdk_openjdk ${OPENJDK8_VMS} /usr/lib/jvm/java ; do
        AC_MSG_CHECKING([for ${dir}]);
        if test -d $dir; then
          SYSTEM_JDK_DIR=$dir ;
