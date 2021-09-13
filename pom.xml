@@ -48,147 +48,149 @@
     <name>Jigawatts</name>
 
     <properties>
-      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <java.includes>${env.JAVA_HOME}</java.includes>      
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.includes>${env.JAVA_HOME}</java.includes>
     </properties>
-    
+
     <dependencies>
-        
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.7.0</version>
             <scope>test</scope>
         </dependency>
-        
+
     </dependencies>
 
-<profiles>
-    <profile>
-        <id>natives</id>
-        <activation>
-            <activeByDefault>true</activeByDefault>
-        </activation>
-        <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <id>compile-cpp</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <phase>process-classes</phase>
+    <profiles>
+        <profile>
+            <id>natives</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>compile-cpp</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>process-classes</phase>
+                                <configuration>
+                                    <executable>gcc</executable>
+                                    <arguments>
+                                        <argument>-v</argument>
+                                        <argument>-shared</argument>
+                                        <argument>-fPIC</argument>
+                                        <argument>-I${java.includes}/include</argument>
+                                        <argument>-I${java.includes}/include/linux</argument>
+                                        <argument>-I/usr/lib64/</argument>
+                                        <argument>-I/usr/include/criu</argument>
+                                        <argument>-I${project.build.directory}/native/javah</argument>
+                                        <argument>-lcriu</argument>
+                                        <argument>-o${project.build.outputDirectory}/libJigawatts.so</argument>
+                                        <argument>${project.basedir}/src/main/cpp/com_redhat_jigawatts_Jigawatts.cpp
+                                        </argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>java</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.8.1</version>
                         <configuration>
-                            <executable>gcc</executable>
-                            <arguments>
-                                <argument>-v</argument>
-                                <argument>-shared</argument>
-                                <argument>-fPIC</argument>
-                                <argument>-I${java.includes}/include</argument>
-                                <argument>-I${java.includes}/include/linux</argument>
-                                <argument>-I/usr/lib64/</argument>
-                                <argument>-I/usr/include/criu</argument>
-                                <argument>-I${project.build.directory}/native/javah</argument>
-                                <argument>-lcriu</argument>
-                                <argument>-o${project.build.outputDirectory}/libJigawatts.so</argument>
-                                <argument>${project.basedir}/src/main/cpp/com_redhat_jigawatts_Jigawatts.cpp</argument>
-                            </arguments>
+                            <compilerVersion>8</compilerVersion>
+                            <source>8</source>
+                            <target>8</target>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-    </profile>
-    <profile>
-        <id>java</id>
-        <activation>
-            <activeByDefault>true</activeByDefault>
-        </activation>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <compilerVersion>8</compilerVersion>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>header-generation</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                       <configuration>
-                            <compilerArgs>
-                                <arg>-h</arg>
-                                <arg>${project.build.directory}/native/javah</arg>
-                            </compilerArgs>
-                            <includes>
-                                 <include>com/redhat/jigawatts/Jigawatts.java</include>
-                            </includes>
-                      </configuration>
-                   </execution>
-               </executions>
-           </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
-                <configuration>
-                    <!-- TODO this only needed when printf is used in native code; can be remove once its gone -->
-                    <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <id>jigawatts</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
+                        <executions>
+                            <execution>
+                                <id>header-generation</id>
+                                <phase>process-sources</phase>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                                <configuration>
+                                    <compilerArgs>
+                                        <arg>-h</arg>
+                                        <arg>${project.build.directory}/native/javah</arg>
+                                    </compilerArgs>
+                                    <includes>
+                                        <include>com/redhat/jigawatts/Jigawatts.java</include>
+                                    </includes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>3.0.0-M5</version>
                         <configuration>
-                            <finalName>jigawatts</finalName>
+                            <!-- TODO this only needed when printf is used in native code; can be remove once its gone -->
+                            <forkNode
+                                    implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-	    <plugin>
-	      <artifactId>maven-clean-plugin</artifactId>
-	      <version>3.1.0</version>
-	      <configuration>
-		<filesets>
-		  <fileset>
-		    <directory>src/test/resources</directory>
-		    <includes>
-		      <include>jigawatts/*</include>
-		      <include>1*</include>
-		    </includes>
-		    <followSymlinks>false</followSymlinks>
-		  </fileset>
-		</filesets>
-	      </configuration>
-	    </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.2.0</version>
-          <configuration>
-          </configuration>
-        </plugin>
-      </plugins>
-    </build>
-    </profile>
-</profiles>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>3.2.4</version>
+                        <executions>
+                            <execution>
+                                <id>jigawatts</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <finalName>jigawatts</finalName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>src/test/resources</directory>
+                                    <includes>
+                                        <include>jigawatts/*</include>
+                                        <include>1*</include>
+                                    </includes>
+                                    <followSymlinks>false</followSymlinks>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.2.0</version>
+                        <configuration>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
