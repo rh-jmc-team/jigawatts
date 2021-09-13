@@ -63,6 +63,52 @@
         
     </dependencies>
 
+<profiles>
+    <profile>
+        <id>natives</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
+        <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>compile-cpp</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <executable>gcc</executable>
+                            <arguments>
+                                <argument>-v</argument>
+                                <argument>-shared</argument>
+                                <argument>-fPIC</argument>
+                                <argument>-I${java.includes}/include</argument>
+                                <argument>-I${java.includes}/include/linux</argument>
+                                <argument>-I/usr/lib64/</argument>
+                                <argument>-I/usr/include/criu</argument>
+                                <argument>-I${project.build.directory}/native/javah</argument>
+                                <argument>-lcriu</argument>
+                                <argument>-o${project.build.outputDirectory}/libJigawatts.so</argument>
+                                <argument>${project.basedir}/src/main/cpp/com_redhat_jigawatts_Jigawatts.cpp</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    </profile>
+    <profile>
+        <id>java</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
     <build>
         <plugins>
             <plugin>
@@ -100,36 +146,6 @@
                     <!-- TODO this only needed when printf is used in native code; can be remove once its gone -->
                     <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <id>compile-cpp</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <phase>process-classes</phase>
-                        <configuration>
-                            <executable>gcc</executable>
-                            <arguments>
-                                <argument>-v</argument>
-                                <argument>-shared</argument>
-                                <argument>-fPIC</argument>
-                                <argument>-I${java.includes}/include</argument>
-                                <argument>-I${java.includes}/include/linux</argument>
-                                <argument>-I/usr/lib64/</argument>
-                                <argument>-I/usr/include/criu</argument>
-                                <argument>-I${project.build.directory}/native/javah</argument>
-                                <argument>-lcriu</argument>
-                                <argument>-o${project.build.outputDirectory}/libJigawatts.so</argument>
-                                <argument>${project.basedir}/src/main/cpp/com_redhat_jigawatts_Jigawatts.cpp</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -173,4 +189,6 @@
         </plugin>
       </plugins>
     </build>
+    </profile>
+</profiles>
 </project>
