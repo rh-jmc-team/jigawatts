@@ -106,6 +106,107 @@
             </build>
         </profile>
         <profile>
+            <id>crosscompile</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>cross-compile-cpp-aarch64</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>process-classes</phase>
+                                <configuration>
+                                    <!-- may not work under root!-->
+                                    <executable>aarch64-linux-gnu-gcc
+                                    </executable><!-- dnf install gcc-c++-aarch64-linux-gnu gcc-aarch64-linux-gnu -->
+                                    <arguments>
+                                        <argument>-v</argument>
+                                        <argument>-shared</argument>
+                                        <!--<argument>-static</argument> ???? can criu be static ????-->
+                                        <!-- mock  -r fedora-35-aarch64 -install glibc-devel glibc-static criu-devel -->
+                                        <argument>--sysroot=/var/lib/mock/fedora-35-aarch64/root/</argument>
+                                        <argument>-fPIC</argument>
+                                        <argument>-I${java.includes}/include</argument>
+                                        <argument>-I${java.includes}/include/linux</argument>
+                                        <argument>-I/usr/lib64/</argument>
+                                        <argument>-I/usr/include/criu</argument>
+                                        <argument>-I${project.build.directory}/native/javah</argument>
+                                        <argument>-Lcriu</argument>
+                                        <argument>-o${project.build.outputDirectory}/libJigawatts_aarch64.so</argument>
+                                        <argument>${project.basedir}/src/main/cpp/com_redhat_jigawatts_Jigawatts.cpp
+                                        </argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>cross-compile-cpp-ppc64le</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>process-classes</phase>
+                                <configuration>
+                                    <!-- may not work under root!-->
+                                    <executable>ppc64le-linux-gnu-gcc
+                                    </executable><!-- dnf install gcc-c++-ppc64le-linux-gnu gcc-ppc64le-linux-gnu -->
+                                    <arguments>
+                                        <argument>-v</argument>
+                                        <argument>-shared</argument>
+                                        <!--<argument>-static</argument> ???? can criu be static ????-->
+                                        <!-- mock  -r fedora-35-ppc64le -install glibc-devel glibc-static criu-devel -->
+                                        <argument>--sysroot=/var/lib/mock/fedora-35-ppc64le/root/</argument>
+                                        <argument>-fPIC</argument>
+                                        <argument>-I${java.includes}/include</argument>
+                                        <argument>-I${java.includes}/include/linux</argument>
+                                        <argument>-I/usr/lib64/</argument>
+                                        <argument>-I/usr/include/criu</argument>
+                                        <argument>-I${project.build.directory}/native/javah</argument>
+                                        <argument>-Lcriu</argument>
+                                        <argument>-o${project.build.outputDirectory}/libJigawatts_ppc64le.so</argument>
+                                        <argument>${project.basedir}/src/main/cpp/com_redhat_jigawatts_Jigawatts.cpp
+                                        </argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <!-- this may sound like nonsense, but the goal is to build against same os as ppc and aarch-->
+                                <id>cross-compile-cpp-x86_64</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>process-classes</phase>
+                                <configuration>
+                                    <!-- may not work under root!-->
+                                    <executable>gcc</executable><!-- dnf install gcc-c++ gcc -->
+                                    <arguments>
+                                        <argument>-v</argument>
+                                        <argument>-shared</argument>
+                                        <!--<argument>-static</argument> ???? can criu be static ????-->
+                                        <!-- mock  -r fedora-35-x86_64 -install glibc-devel glibc-static criu-devel -->
+                                        <argument>--sysroot=/var/lib/mock/fedora-35-x86_64/root/</argument>
+                                        <argument>-fPIC</argument>
+                                        <argument>-I${java.includes}/include</argument>
+                                        <argument>-I${java.includes}/include/linux</argument>
+                                        <argument>-I/usr/lib64/</argument>
+                                        <argument>-I/usr/include/criu</argument>
+                                        <argument>-I${project.build.directory}/native/javah</argument>
+                                        <argument>-Lcriu</argument>
+                                        <argument>-o${project.build.outputDirectory}/libJigawatts_x86_64.so</argument>
+                                        <argument>${project.basedir}/src/main/cpp/com_redhat_jigawatts_Jigawatts.cpp
+                                        </argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>java</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
