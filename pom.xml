@@ -77,26 +77,53 @@
                         <version>3.0.0</version>
                         <executions>
                             <execution>
-                                <id>compile-cpp</id>
+                                <id>default-autogen</id>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
                                 <phase>process-classes</phase>
                                 <configuration>
-                                    <executable>gcc</executable>
+                                    <executable>./autogen.sh</executable>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>default-configure</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>process-classes</phase>
+                                <configuration>
+                                    <executable>./configure</executable>
+                                    <arguments>
+                                        <argument>--with-jdk=${env.JAVA_HOME}</argument> <!-- ensuring maven's jdk is used -->
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>make-default-natives</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>process-classes</phase>
+                                <configuration>
+                                    <executable>make</executable>
+                                    <arguments>
+                                        <argument>natives</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-default-lib</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>process-classes</phase>
+                                <configuration>
+                                    <executable>mv</executable>
                                     <arguments>
                                         <argument>-v</argument>
-                                        <argument>-shared</argument>
-                                        <argument>-fPIC</argument>
-                                        <argument>-I${java.includes}/include</argument>
-                                        <argument>-I${java.includes}/include/linux</argument>
-                                        <argument>-I/usr/lib64/</argument>
-                                        <argument>-I/usr/include/criu</argument>
-                                        <argument>-I${project.build.directory}/native/javah</argument>
-                                        <argument>-lcriu</argument>
-                                        <argument>-o${project.build.outputDirectory}/libJigawatts.so</argument>
-                                        <argument>${project.basedir}/src/main/cpp/com_redhat_jigawatts_Jigawatts.cpp
-                                        </argument>
+                                        <argument>build/libJigawatts.so</argument>
+                                        <argument>target/classes/libJigawatts.so</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -121,24 +148,6 @@
                             <source>8</source>
                             <target>8</target>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <id>header-generation</id>
-                                <phase>process-sources</phase>
-                                <goals>
-                                    <goal>compile</goal>
-                                </goals>
-                                <configuration>
-                                    <compilerArgs>
-                                        <arg>-h</arg>
-                                        <arg>${project.build.directory}/native/javah</arg>
-                                    </compilerArgs>
-                                    <includes>
-                                        <include>com/redhat/jigawatts/Jigawatts.java</include>
-                                    </includes>
-                                </configuration>
-                            </execution>
-                        </executions>
                     </plugin>
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
@@ -175,9 +184,20 @@
                                     <directory>src/test/resources</directory>
                                     <includes>
                                         <include>jigawatts/*</include>
+                                        <include>jigawatts/testhooks/**</include>
                                         <include>1*</include>
                                     </includes>
                                     <followSymlinks>false</followSymlinks>
+                                </fileset>
+                                <fileset>
+                                    <directory>build</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                    <followSymlinks>false</followSymlinks>
+                                </fileset>
+                                <fileset>
+                                    <directory>build</directory>
                                 </fileset>
                             </filesets>
                         </configuration>
