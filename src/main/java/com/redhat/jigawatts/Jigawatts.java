@@ -78,7 +78,9 @@ public class Jigawatts {
         }
 
         writeRestoreHooks(dir);
+        preNativeActions();
         crContext.saveTheWorldNative(dir, leaveRunning);
+        postNativeActions();
     }
 
     public static void saveTheWorld(String dir) throws IOException {
@@ -117,12 +119,23 @@ public class Jigawatts {
     }
 
     public static void restoreTheWorld(String dir) throws IOException {
+        preNativeActions();
         crContext.restoreTheWorldNative(dir);
+        postNativeActions();
         readRestoreHooks(dir);
         for (Hook h : restoreHooks) {
             h.run();
         }
     }
+
+    private static void postNativeActions() throws IOException {
+        SssPipeNssFileException.restoreSssNssFile();
+    }
+
+    private static void preNativeActions() throws IOException {
+        SssPipeNssFileException.closeSssNssFile();
+    }
+
 
     public static void registerCheckpointHook(Hook h) {
         crContext.checkpointHooks.add(h);

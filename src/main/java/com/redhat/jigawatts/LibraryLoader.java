@@ -35,7 +35,7 @@ class LibraryLoader {
         }
     }
 
-    private static void jigaLog(String s) {
+    static void jigaLog(String s) {
         if (getVerbose()) {
             if (getVerboseFile() == null) {
                 System.err.println(s);
@@ -92,6 +92,10 @@ class LibraryLoader {
         return getPropertyOrVar(LIBRARY_EXTERNAL_PROP);
     }
 
+    static String getSssNss() {
+        return getPropertyOrVar(SSS_NSS);
+    }
+
     private static void loadInJarLibrary() {
         File tmpLibrary = null;
         try {
@@ -130,6 +134,10 @@ class LibraryLoader {
     private static final String LIBRARY_EXTERNAL_PROP = "jigawatts.library";
     private static final String VERBOSE_PROP = "jigawatts.verbose";
     private static final String VERBOSE_FILE_PROP = "jigawatts.verbose.file";
+    static final String SSS_NSS = "jigawatts.ssspipesnss";
+    static final String SSS_NSS_IGNORE = "ignore";
+    static final String SSS_NSS_FORCE = "force";
+    static final String SSS_NSS_FIERCE = "fierce";
     private static final String SYSTEM_LIB_SWITCH = "SYSTEM";
 
     static void loadLibrary() {
@@ -172,5 +180,15 @@ class LibraryLoader {
         System.out.println("    " + PROP + VERBOSE_FILE_PROP + "/" + VAR + propertyToVar(VERBOSE_FILE_PROP) + ": " + getVerboseFile());
         System.out.println(" * This switch can set library loading logging to append to exact file instead of stderr");
         System.out.println("    " + PROP + VERBOSE_PROP + "/" + VAR + propertyToVar(VERBOSE_PROP) + ": " + getVerbose());
+        System.out.println(" * " + sssNssLine1());
+        System.out.println("    " + sssNssLine2());
+    }
+
+    static String sssNssLine1() {
+        return "criu do not work if " + SssPipeNssFileException.SSS_NSS_FILE + " exists. By default we throw exception, if we should try, set following variable to `" + SSS_NSS_IGNORE + "`. Use `" + SSS_NSS_FORCE + "` to let us delete it and resore it afterwards. Set `"+SSS_NSS_FIERCE+"`, similar to "+SSS_NSS_FORCE+", but ignoring any exceptions";
+    }
+
+    static String sssNssLine2() {
+        return PROP + SSS_NSS + "/" + VAR + propertyToVar(SSS_NSS) + ": " + getSssNss();
     }
 }
