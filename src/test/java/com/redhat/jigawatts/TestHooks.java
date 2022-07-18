@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 class Node {
     Node left;
@@ -162,6 +163,9 @@ public class TestHooks {
 	Path tmpDir = Paths.get("src","test","resources","jigawatts", "testhooks", "without");
 	Node[] trees = generateALotOfGarbage(5000, 1000, 100000);
 	// we want trees alive right up until the call to savetheworld	
+	if (Arrays.hashCode(trees) == System.nanoTime()) {
+		System.out.println(" ");
+	}
 	Jigawatts.saveTheWorld(tmpDir.toString());
     }
 
@@ -169,6 +173,10 @@ public class TestHooks {
 	Jigawatts.registerCheckpointHook(new TestHooksBeforeHook("Test Hooks Before Hook"));
 	Path tmpDir = Paths.get("src","test","resources","jigawatts", "testhooks", "with");
 	Node[] trees = generateALotOfGarbage(5000, 1000, 100000);
+	// Use trees to avoid being dead code eliminated
+	if (Arrays.hashCode(trees) == System.nanoTime()) {
+		System.out.println(" ");
+	}
 	Jigawatts.saveTheWorld(tmpDir.toString());
     }
 
