@@ -78,7 +78,7 @@ public class TestHooks {
 	    System.out.println("output line " + i++ + " = " + l);
 	}
 	i = 0;
-	while ((l = output.readLine()) != null) {
+	while ((l = error.readLine()) != null) {
 	    System.out.println("error line " + i++ + " = " + l);
 	}
 	
