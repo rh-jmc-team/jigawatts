@@ -6,11 +6,18 @@ import org.junit.jupiter.api.Test;
 public class LibraryLoaderTest {
 
     @Test
-    public void testTrimToNull(){
-        Assertions.assertNull(LibraryLoader.trimToNull(null));
-        Assertions.assertNull(LibraryLoader.trimToNull(""));
-        Assertions.assertNull(LibraryLoader.trimToNull("    "));
-        Assertions.assertEquals("hi!", LibraryLoader.trimToNull("  hi!  "));
+    public void testTrimToNull() {
+        Assertions.assertNull(LibraryLoader.trimToNull(null, true));
+        Assertions.assertNull(LibraryLoader.trimToNull("", true));
+        Assertions.assertNull(LibraryLoader.trimToNull("    ", true));
+        Assertions.assertEquals("hi!", LibraryLoader.trimToNull("  hi!  ", true));
+    }
+
+    public void testTrimToWithouNUll() {
+        Assertions.assertNull(LibraryLoader.trimToNull(null, false));
+        Assertions.assertEquals("", LibraryLoader.trimToNull("", false));
+        Assertions.assertEquals("", LibraryLoader.trimToNull("    ", false));
+        Assertions.assertEquals("hi!", LibraryLoader.trimToNull("  hi!  ", false));
     }
 
     @Test

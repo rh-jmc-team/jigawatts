@@ -13,7 +13,31 @@ import java.util.Date;
 
 class LibraryLoader {
 
+    private static String getInternalArchedLibrarySuffix() {
+        if (getPropertyOrVar(LIBRARY_ARCH_PROP, false) != null) {
+            return getPropertyOrVar(LIBRARY_ARCH_PROP, false);
+        }
+        final String suffixDelimiter = "_"; //intentionally here, so LIBRARY_ARCH_PROP can get rid of it
+        if (System.getProperty("os.arch").equals("amd64")) {
+            return suffixDelimiter + "x86_64";
+        } else if (System.getProperty("os.arch").equals("aarch64") || System.getProperty("os.arch").startsWith("arm")) {
+            return suffixDelimiter + "aarch64";
+        } else if (System.getProperty("os.arch").equals("ppc64le") || System.getProperty("os.arch").startsWith("ppc64")) {
+            return suffixDelimiter + "aarch64";
+        } else {
+            return null;
+        }
+    }
+
+    private static URL getInternalArchedLibrary() {
+        String libraryName = System.mapLibraryName("Jigawatts" + getInternalArchedLibrarySuffix());
+        return Jigawatts.class.getClassLoader().getResource(libraryName);
+    }
+
     private static URL getInternalLibrary() {
+        if (getInternalArchedLibrary() != null) {
+            return getInternalArchedLibrary();
+        }
         String libraryName = System.mapLibraryName("Jigawatts");
         return Jigawatts.class.getClassLoader().getResource(libraryName);
     }
@@ -46,7 +70,7 @@ class LibraryLoader {
                         logPath.toFile().createNewFile();
                     }
                     Files.write(logPath, ("[" + new Date().toString() + "] " + s + "\n").getBytes(), StandardOpenOption.APPEND);
-                } catch (Exception ex){
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
@@ -54,22 +78,29 @@ class LibraryLoader {
     }
 
     private static String getPropertyOrVar(String s) {
+        return getPropertyOrVar(s, true);
+    }
+
+    private static String getPropertyOrVar(String s, boolean trimToNull) {
         String prop = System.getProperty(s);
         if (prop != null) {
-            return trimToNull(prop);
+            return trimToNull(prop, trimToNull);
         }
-        return trimToNull(System.getenv(propertyToVar(s)));
+        return trimToNull(System.getenv(propertyToVar(s)), trimToNull);
     }
 
     static String propertyToVar(String s) {
         return s.toUpperCase().replace(".", "_");
     }
 
-    static String trimToNull(String s) {
+    static String trimToNull(String s, boolean reallyTrim) {
         if (s == null) {
             return null;
         }
         s = s.trim();
+        if (!reallyTrim) {
+            return s;
+        }
         if (s.isEmpty()) {
             return null;
         }
@@ -130,6 +161,7 @@ class LibraryLoader {
         throw new RuntimeException(lib + " library not found on java.library.path/LD_LIBRARY_PATH!");
     }
 
+    private static final String LIBRARY_ARCH_PROP = "jigawatts.library.arch";
     private static final String LIBRARY_TARGETFILE_PROP = "jigawatts.library.targetfile";
     private static final String LIBRARY_EXTERNAL_PROP = "jigawatts.library";
     private static final String VERBOSE_PROP = "jigawatts.verbose";
@@ -171,6 +203,8 @@ class LibraryLoader {
         System.out.println("Native library loaded!");
         System.out.println("If jigawatts is packed with embedded dynamic library, it is used in advance. If it is missing, the system library is searched for.");
         System.out.println("To change the loading of native bits you can use following properties/variables. Property is used with priority.");
+        System.out.println(" * In release jar, native library for ppc64le, aarch64 and x86_64 is packed, and used with priority. You can chnage the detected arch by:");
+        System.out.println("    " + PROP + LIBRARY_ARCH_PROP + "/" + VAR + propertyToVar(LIBRARY_ARCH_PROP) + " (ignored if not existing, now " + System.getProperty("os.arch") + ")");
         System.out.println(" * The internal library will be unpacked and loaded from given file. If given file exists, it is not overwritten");
         System.out.println("    " + PROP + LIBRARY_TARGETFILE_PROP + "/" + VAR + propertyToVar(LIBRARY_TARGETFILE_PROP) + ": " + getInternalLibraryExtractedFile());
         System.out.println(" * The internal library will not be used, given file will be used");
