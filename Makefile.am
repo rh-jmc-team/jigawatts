@@ -43,6 +43,7 @@ JIGA_MAVEN_DIR = META-INF/maven/$(GROUP)/$(ARTIFACT)
 
 JIGA_NATIVE_FUNCS = com/redhat/jigawatts/Jigawatts.java
 JIGA_NATIVE_HDRS = $(subst .java,.h,$(subst /,_,$(JIGA_NATIVE_FUNCS)))
+JIGA_NATIVE_HDRS_PREFIXED = $(addprefix $(JIGA_INCLUDEDIR)/,$(JIGA_NATIVE_HDRS))
 JIGA_NATIVE_SRC = $(subst .java,.cpp,$(subst /,_,$(JIGA_NATIVE_FUNCS)))
 JIGA_NATIVE_OBJS = $(subst .cpp,.o,$(JIGA_NATIVE_SRC))
 JIGA_LIB = libJigawatts.so
@@ -74,16 +75,23 @@ $(JIGA_BUILDDIR)/source-files.txt:
 clean-source-file-list:
 	$(RM) $(JIGA_BUILDDIR)/source-files.txt
 
+$(JIGA_NATIVE_HDRS_PREFIXED): $(JIGA_BUILDDIR)/source-files.txt
+	$(SYSTEM_JDK_DIR)/bin/javac -g $(JAVACFLAGS) \
+	      -d `mktemp -d` \
+	      -h $(JIGA_INCLUDEDIR) \
+	      -sourcepath $(JIGA_JAVA_SRCDIR) \
+	      @$<;
+
 $(JIGA_STAMPDIR)/classes.stamp: $(JIGA_BUILDDIR)/source-files.txt
 	$(SYSTEM_JDK_DIR)/bin/javac -g $(JAVACFLAGS) \
-	      -d $(JIGA_BUILDDIR) -h $(JIGA_INCLUDEDIR) \
+	      -d $(JIGA_BUILDDIR) \
 	      -sourcepath $(JIGA_JAVA_SRCDIR) \
 	      @$< ;
 	mkdir -p $(JIGA_STAMPDIR)
 	touch $@
 
 clean-classes-and-headers:
-	$(RM) $(addprefix $(JIGA_INCLUDEDIR)/,$(JIGA_NATIVE_HDRS))
+	$(RM) $(JIGA_NATIVE_HDRS_PREFIXED)
 	$(RM) -r $(JIGA_BUILDDIR)/$(JAVA_ROOT_DIR)
 	$(RM) $(JIGA_STAMPDIR)/classes.stamp
 
@@ -95,7 +103,9 @@ $(JIGA_BUILDDIR)/%.o: $(JIGA_NATIVE_SRCDIR)/%.cpp
 clean-native-objects:
 	$(RM) $(addprefix $(JIGA_BUILDDIR)/,$(JIGA_NATIVE_OBJS))
 
-$(JIGA_BUILDDIR)/$(JIGA_LIB): $(addprefix $(JIGA_INCLUDEDIR)/,$(JIGA_NATIVE_HDRS)) \
+natives: $(JIGA_BUILDDIR)/$(JIGA_LIB)
+
+$(JIGA_BUILDDIR)/$(JIGA_LIB): $(JIGA_NATIVE_HDRS_PREFIXED) \
   $(addprefix $(JIGA_BUILDDIR)/,$(JIGA_NATIVE_OBJS))
 	$(CC) $(LDFLAGS) $(addprefix $(JIGA_BUILDDIR)/,$(JIGA_NATIVE_OBJS)) -shared -o $@ $(CRIU_LIBS)
 
