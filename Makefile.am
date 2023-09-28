@@ -97,7 +97,7 @@ clean-native-objects:
 
 $(JIGA_BUILDDIR)/$(JIGA_LIB): $(addprefix $(JIGA_INCLUDEDIR)/,$(JIGA_NATIVE_HDRS)) \
   $(addprefix $(JIGA_BUILDDIR)/,$(JIGA_NATIVE_OBJS))
-	$(CC) $(LDFLAGS) $(addprefix $(JIGA_BUILDDIR)/,$(JIGA_NATIVE_OBJS)) -shared -o $@ $(CRIU_LIBS)
+	$(CC) $(LDFLAGS) $(addprefix $(JIGA_BUILDDIR)/,$(JIGA_NATIVE_OBJS)) -shared -o $@ $(CRIU_LIBS) $(CFLAGS)
 
 clean-lib:
 	$(RM) $(JIGA_BUILDDIR)/$(JIGA_LIB)
